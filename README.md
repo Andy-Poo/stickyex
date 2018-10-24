@@ -1,9 +1,9 @@
 # stickyex
 Mac utility to export the Stickies database to separate text files.
 
-Download the file __stickyex.zip
+Download the file stickyex.zip
 
-Unzip the file __stickyex.zip file.
+Unzip the file stickyex.zip file.
 
 Run the file stickyex.py by opening the Terminal app in Finder
 in Applications/Utilities

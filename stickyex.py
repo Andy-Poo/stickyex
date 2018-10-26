@@ -20,8 +20,10 @@ See <http://www.gnu.org/licenses/> for a description of the LGPL.
 import re
 import os
 
+# destination location of where to write the exported files
 dst = '/Documents/stickyex/'
 
+# patterns of formatting codes to strip from the Stickies file
 pat = re.compile(r'\\')
 pat1 = re.compile(r'\\fs[\d]*')
 pat2 = re.compile(r'(\\expnd[\d]|\\expndtw[\d]|\\kerning[\d]|deftab[\d]*)')
@@ -35,35 +37,47 @@ pat9 = re.compile(r'^(css|csgeneric|rgbc)')
 
 def main():
     global dst
+
+    # your home directory
     home = os.environ['HOME']
+
+    # location of the Stickies file
     fn = home + '/Library/StickiesDatabase'
     try:
         fp = open(fn, 'rb')
     except Exception as e:
         print e
         return -1
+
+    # make the destination directory
     dst = home + dst
     if not os.path.isdir(dst):
         try:
             os.mkdir(dst)
         except Exception as e:
             print e
+
+    # we need an initial name for the first exported file
     fn = dst + "STICKY-0.txt"
+
+    # open it for creation
     try:
         out = open(fn, 'w')
     except Exception as e:
         print e
         return -1
+
+    # track which note we are on and use a state machine to detect the start of a new note
     count = 0
     state = 0
-    #print >> out, fn
     for line in fp:
-        #print >> out, line
+        # is this the start of a new note?
         if '}\x01' in line:
             count += 1
             state = 1
-            #print >> out, ('@'*40)+'\n%d' % count
             continue
+
+        # discard all formatting codes
         if '{\\' in line:
             continue
         text = line
@@ -78,13 +92,16 @@ def main():
         text = pat6.sub('', text)
         text = pat7.sub('', text)
         text = pat8.sub('', text)
-        #text = pat9.sub('', text)
         text = pat.sub('', text)
         text = text.strip(';')
         text = text.strip()
         if text and not pat9.search(text):
             if state:
+                # this was the start of a new note
                 state = 0
+
+                # create a file name for the exported note
+                # using the first 40 alphanumeric characters of the note
                 fn = ''
                 for c in text:
                     if c.isalnum():
@@ -92,15 +109,19 @@ def main():
                 fn = fn[:40]
                 fn = dst + "STICKY-%s-%d.txt" % (fn, count)
                 try:
+                    # close the previous exported note and open the new one
                     out.close()
                     out = open(fn, 'w')
                 except Exception as e:
                     print e
+                # write the text from the note to the exported file
                 print >> out, text
             else:
                 print >> out, text
+    # close open files
     fp.close()
     out.close()
 
+# are we running this file from the command line?
 if __name__ == '__main__':
     main()

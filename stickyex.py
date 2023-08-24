@@ -46,7 +46,7 @@ def main():
     try:
         fp = open(fn, 'rb')
     except Exception as e:
-        print e
+        print(e)
         return -1
 
     # make the destination directory
@@ -55,7 +55,7 @@ def main():
         try:
             os.mkdir(dst)
         except Exception as e:
-            print e
+            print(e)
 
     # we need an initial name for the first exported file
     fn = dst + "STICKY-0.txt"
@@ -64,7 +64,7 @@ def main():
     try:
         out = open(fn, 'w')
     except Exception as e:
-        print e
+        print(e)
         return -1
 
     # track which note we are on and use a state machine to detect the start of a new note
@@ -113,11 +113,11 @@ def main():
                     out.close()
                     out = open(fn, 'w')
                 except Exception as e:
-                    print e
+                    print(e)
                 # write the text from the note to the exported file
-                print >> out, text
+                print(text, file=out)
             else:
-                print >> out, text
+                print(text, file=out)
     # close open files
     fp.close()
     out.close()
